@@ -1,0 +1,54 @@
+{
+  "verificate_il": "2026-09-24",
+  "nota": "Valori usati dal calcolatore. 'stato': verificato = controllato su fonte ufficiale; indicativo = stima non ancora verificata. Prima di pubblicare, portare tutti a 'verificato'.",
+  "valori": {
+    "aliquota_gs": {
+      "valore": 26.0,
+      "unita": "%",
+      "stato": "verificato",
+      "descrizione": "INPS Gestione Separata - professionisti senza altra copertura",
+      "fonte": "INPS, circolare n. 8 del 03/02/2026",
+      "url": "https://www.inps.it/"
+    },
+    "imposta_sostitutiva": {
+      "valore": 15,
+      "unita": "%",
+      "stato": "indicativo",
+      "descrizione": "Forfettario - aliquota ordinaria",
+      "fonte": "L. 190/2014",
+      "url": "https://www.agenziaentrate.gov.it/"
+    },
+    "imposta_sostitutiva_startup": {
+      "valore": 5,
+      "unita": "%",
+      "stato": "indicativo",
+      "descrizione": "Forfettario - primi 5 anni, se requisiti nuova attivita'",
+      "fonte": "L. 190/2014",
+      "url": "https://www.agenziaentrate.gov.it/"
+    },
+    "coefficiente_servizi": {
+      "valore": 78,
+      "unita": "%",
+      "stato": "indicativo",
+      "descrizione": "Coefficiente di redditivita' - servizi professionali (es. 78%)",
+      "fonte": "Agenzia delle Entrate",
+      "url": "https://www.agenziaentrate.gov.it/"
+    },
+    "iva_ordinaria": {
+      "valore": 22,
+      "unita": "%",
+      "stato": "indicativo",
+      "descrizione": "IVA ordinaria italiana",
+      "fonte": "DPR 633/1972",
+      "url": "https://www.agenziaentrate.gov.it/"
+    },
+    "massimale_gs": {
+      "valore": 122295,
+      "unita": "EUR",
+      "stato": "indicativo",
+      "descrizione": "Massimale reddito Gestione Separata 2026",
+      "fonte": "INPS, circolare n. 8 del 03/02/2026",
+      "url": "https://www.inps.it/"
+    }
+  }
+}
