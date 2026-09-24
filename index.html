@@ -225,11 +225,12 @@ const eur = n => (n < 0 ? "−" : "") + Math.abs(Math.round(n)).toLocaleString("
  // --- Versione Pro: configurazione Gumroad ---
 const GUMROAD_PRODOTTO  = "https://ontirius.gumroad.com/l/netto-piva-forfettario";
 const GUMROAD_CHECKOUT  = GUMROAD_PRODOTTO + "?wanted=true";
-// La verifica licenze vuole il permalink *interno* del prodotto, che non sempre
-// coincide con lo slug personalizzato dell'URL (qui: nzgir). Proviamo entrambi:
-// usando il permalink sbagliato l'API risponde come per un codice errato, quindi
-// non si puo' distinguere l'errore senza tentare.
-const GUMROAD_PERMALINK_CANDIDATI = ["nzgir", "netto-piva-forfettario"];
+// La verifica licenze richiede il "product_id" (non il permalink) per i prodotti
+// creati dal 9/1/2023 — fonte: help.gumroad.com/article/76-license-keys.
+// Il permalink interno ("nzgir") NON coincide con lo slug dell'URL: lo teniamo
+// come ripiego, perché su un campo sbagliato l'API risponde come per un codice errato.
+const GUMROAD_PRODUCT_ID = "-ZOs5fnKfLM6ePh21fybKA==";
+const GUMROAD_PERMALINK  = "nzgir";
 const LIC_STORAGE = "qrt_pro_licenza";
 const TAR_STORAGE = "qrt_tariffe";
 
@@ -346,8 +347,15 @@ async function sblocca(){
   stato.textContent = "Verifico…"; stato.style.color = "var(--dim)";
   try {
     let acquisto = null;
-    for (const permalink of GUMROAD_PERMALINK_CANDIDATI){
-      const body = new URLSearchParams({ product_permalink: permalink, license_key: codice });
+    const tentativi = [
+      { product_id: GUMROAD_PRODUCT_ID },
+      { product_permalink: GUMROAD_PERMALINK }
+    ];
+    for (const base of tentativi){
+      const body = new URLSearchParams(Object.assign({
+        license_key: codice,
+        increment_uses_count: "false"   // nessun uso consumato: non imponiamo limiti
+      }, base));
       const r = await fetch("https://api.gumroad.com/v2/licenses/verify", { method: "POST", body });
       const d = await r.json();
       if (d.success){ acquisto = d; break; }
