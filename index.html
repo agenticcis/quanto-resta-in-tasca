@@ -46,6 +46,15 @@
   .sub{color:var(--dim);margin:6px 0 22px;max-width:760px}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   @media(max-width:840px){.grid{grid-template-columns:1fr}}
+  /* --- Mobile: il campo ATECO e i menu a tendina devono essere comodi col dito --- */
+  @media(max-width:640px){
+    .row{grid-template-columns:1fr}
+    input,select{font-size:16px}            /* 16px evita lo zoom automatico di iOS */
+    #ateco-lista div{padding:12px 10px}      /* voci piu' alte: piu' facili da toccare */
+    #ateco-lista{max-height:230px}
+    .wrap{padding:14px}
+    .big{font-size:30px}
+  }
   .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
         border-radius:var(--radius);padding:18px}
   .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);margin:0 0 14px}
@@ -397,6 +406,13 @@ el("ateco").addEventListener("focus", () => { mostraListaAteco(); });
 el("ateco").addEventListener("input", () => { aggiornaDaAteco(false); mostraListaAteco(); calcola(); });
 el("ateco").addEventListener("blur", () => { nascondiListaAteco(); });
 el("ateco").addEventListener("change", () => { aggiornaDaAteco(true); calcola(); });
+
+// Toccando fuori dal campo, la lista si chiude (su mobile serve un tocco esplicito).
+document.addEventListener("pointerdown", (ev) => {
+  const box = el("ateco-lista");
+  if (!box || box.hidden) return;
+  if (!box.contains(ev.target) && ev.target !== el("ateco")) nascondiListaAteco();
+});
 calcola();
 statoProIniziale();
 
@@ -425,6 +441,7 @@ function applicaAliquote(d){
 
 let ATECO = null;
 let LISTA_ATECO = [];
+let timerListaAteco = null;
 
 function coefficienteDaAteco(codice){
   if (!codice || !ATECO) return null;
@@ -514,17 +531,26 @@ function mostraListaAteco(){
   }).join("");
   box.hidden = false;
   box.querySelectorAll("div[data-codice]").forEach(d => {
-    d.addEventListener("mousedown", (ev) => {
-      ev.preventDefault(); // evita il blur prima della scelta
+    // Su desktop basta mousedown; su mobile serve touchstart, altrimenti il
+    // campo perde il focus (blur) e la lista si chiude prima del tocco.
+    const scegli = (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
       el("ateco").value = d.getAttribute("data-codice");
       box.hidden = true;
       aggiornaDaAteco(true);
       calcola();
-    });
+    };
+    d.addEventListener("touchstart", scegli, {passive: false});
+    d.addEventListener("mousedown", scegli);
   });
 }
 
-function nascondiListaAteco(){ el("ateco-lista").hidden = true; }
+function nascondiListaAteco(){
+  // ritardo: su mobile il blur arriva PRIMA che il tocco raggiunga la voce
+  if (timerListaAteco) clearTimeout(timerListaAteco);
+  timerListaAteco = setTimeout(() => { el("ateco-lista").hidden = true; }, 180);
+}
 
 /* =====================  VERSIONE PRO  ===================== */
 
