@@ -135,11 +135,24 @@ def pagina(imp, dati, dati5):
   <a class="bottone" href="../">Apri il calcolatore gratuito →</a>
 </div>
 
-<h2>Perché il coefficiente conta</h2>
-<p>Il regime forfettario non tassa tutto il fatturato: si applica un <b>coefficiente di
-redditività</b> che dipende dal codice ATECO. Per il settore informatico (divisione 62) è
-<b>67%</b>, non 78%: il 78% vale per avvocati, ingegneri e altre professioni. Sbagliare questo
-numero cambia il risultato di migliaia di euro all'anno.</p>
+<h2>Perché il coefficiente conta (e perché le cifre online non concordano)</h2>
+<p>Cercando online la stessa domanda si trovano risposte diverse: <b>2.500, 2.650, 2.816 €</b>…
+La differenza sta quasi sempre nel <b>coefficiente di redditività</b> usato. Il regime forfettario
+non tassa tutto il fatturato: si applica un coefficiente che dipende dal codice ATECO.</p>
+<table style="width:100%;border-collapse:collapse;margin:12px 0">
+  <tr><th style="text-align:left;padding:8px 0;color:#9fb0c0;font-size:14px">Settore</th>
+      <th style="text-align:right;padding:8px 0;color:#9fb0c0;font-size:14px">Coefficiente</th></tr>
+  <tr><td style="padding:7px 0;border-top:1px solid var(--line)"><b>Informatica / software</b> (div. 62) — <i>il nostro caso</i></td>
+      <td style="text-align:right;border-top:1px solid var(--line)"><b>67%</b></td></tr>
+  <tr><td style="padding:7px 0;border-top:1px solid var(--line)">Professioni (avvocati, ingegneri, consulenza 69-75)</td>
+      <td style="text-align:right;border-top:1px solid var(--line)">78%</td></tr>
+</table>
+<p class="nota">Molti calcolatori usano il <b>78%</b> come ipotesi generica "da professionista". Per
+l'informatica è <b>67%</b>: usare 78% fa sembrare che serva fatturare <b>più</b> del necessario.
+Questa pagina usa il valore corretto per il codice ATECO 62.02.00 — <b>verificato sull'Allegato 4
+della Legge 190/2014</b>, non copiato da altri siti.</p>
+<p class="nota">Se il tuo codice ATECO è diverso, il coefficiente cambia: usa il
+<a href="../">calcolatore</a> per il tuo caso.</p>
 
 <h2>Altre cifre utili</h2>
 <ul>
