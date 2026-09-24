@@ -29,6 +29,8 @@
         border-radius:9px;padding:10px 12px;font-size:15px;outline:none}
   input:focus,select:focus{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(74,168,255,.15)}
   .hint{font-size:12px;color:#6f7d8c;margin-top:4px}
+  .hint.fb-acceso{color:var(--acc);font-weight:600}
+  .hint.fb-errore{color:var(--bad)}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .out{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line)}
   .out:last-child{border-bottom:0}
@@ -192,7 +194,7 @@
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
         <button onclick="copiaPreventivo()">Copia preventivo</button>
         <button class="ghost" onclick="stampaPreventivo()">Stampa / PDF</button>
-        <button class="ghost" onclick="salvaTariffe()">Salva le mie tariffe</button>
+        <button class="ghost" id="btn-salva" onclick="salvaTariffe()">Salva le mie tariffe</button>
       </div>
       <p class="hint" id="p_esito"></p>
       <pre class="prev" id="p_testo" hidden></pre>
@@ -517,16 +519,16 @@ function copiaPreventivo(){
   pre.textContent = t;
   if (navigator.clipboard){
     navigator.clipboard.writeText(t).then(
-      () => set("p_esito", "Preventivo copiato negli appunti."),
-      () => set("p_esito", "Copia automatica non riuscita: seleziona il testo qui sotto."));
+      () => esito("p_esito", "✓ Preventivo copiato negli appunti.", "acceso"),
+      () => esito("p_esito", "Copia automatica non riuscita: seleziona il testo qui sotto.", "errore"));
   } else {
-    set("p_esito", "Copia manuale: seleziona il testo qui sotto.");
+    esito("p_esito", "Copia manuale: seleziona il testo qui sotto.", "errore");
   }
 }
 
 function stampaPreventivo(){
   const w = window.open("", "_blank");
-  if (!w){ set("p_esito", "Il browser ha bloccato la finestra. Consenti i popup per questo sito."); return; }
+  if (!w){ esito("p_esito", "Il browser ha bloccato la finestra. Consenti i popup per questo sito.", "errore"); return; }
   const esc = s => String(s).replace(/[&<>]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;" }[c]));
   w.document.write("<!doctype html><html lang='it'><head><meta charset='utf-8'><title>Preventivo</title>" +
     "<style>body{font:14px/1.7 system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 20px;color:#111}" +
@@ -534,6 +536,21 @@ function stampaPreventivo(){
   w.document.close();
   w.focus();
   w.print();
+}
+
+// Mostra un messaggio in modo che si veda davvero, e lo cancella da solo dopo qualche secondo.
+let timerEsito = null;
+function esito(id, testo, tipo){
+  const n = el(id);
+  if (!n) return;
+  n.textContent = testo;
+  n.classList.remove("fb-acceso", "fb-errore");
+  if (tipo) n.classList.add(tipo === "errore" ? "fb-errore" : "fb-acceso");
+  clearTimeout(timerEsito);
+  timerEsito = setTimeout(() => {
+    n.textContent = "";
+    n.classList.remove("fb-acceso", "fb-errore");
+  }, 6000);
 }
 
 function salvaTariffe(){
@@ -544,11 +561,18 @@ function salvaTariffe(){
     p_ore: el("p_ore").value, p_tariffa: el("p_tariffa").value,
     p_spese: el("p_spese").value, p_desc: el("p_desc").value
   };
+  const b = el("btn-salva");
   try {
     localStorage.setItem(TAR_STORAGE, JSON.stringify(t));
-    set("p_esito", "Tariffe salvate su questo browser.");
+    esito("p_esito", "✓ Tariffe salvate su questo browser: le ritrovi alla prossima apertura.", "acceso");
+    if (b){
+      if (!b.dataset.testoOriginale) b.dataset.testoOriginale = b.textContent;
+      b.textContent = "✓ Salvate";
+      b.classList.add("fb-acceso");
+      setTimeout(() => { b.textContent = b.dataset.testoOriginale; b.classList.remove("fb-acceso"); }, 2000);
+    }
   } catch(e){
-    set("p_esito", "Salvataggio non riuscito: " + e.message);
+    esito("p_esito", "Salvataggio non riuscito: " + e.message, "errore");
   }
 }
 
