@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quanto resta davvero in tasca — Prototipo</title>
+<style>
+  :root{
+    --bg:#0f1216; --card:#171c22; --card2:#1e242c; --line:#2a323c;
+    --txt:#e8edf3; --dim:#96a2b0; --acc:#3ddc97; --acc2:#4aa8ff; --warn:#ffb454; --bad:#ff6b6b;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 20% -10%,#1b2530,var(--bg));
+       color:var(--txt);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:28px 20px 80px}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  h1{font-size:26px;margin:0;letter-spacing:-.4px}
+  .badge{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+         background:#2b3a4d;color:var(--acc2);padding:5px 10px;border-radius:999px;border:1px solid #33506e}
+  .sub{color:var(--dim);margin:6px 0 22px;max-width:760px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:840px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);
+        border-radius:var(--radius);padding:18px}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);margin:0 0 14px}
+  label{display:block;font-size:13px;color:var(--dim);margin:12px 0 5px}
+  input,select{width:100%;background:#0d1116;border:1px solid var(--line);color:var(--txt);
+        border-radius:9px;padding:10px 12px;font-size:15px;outline:none}
+  input:focus,select:focus{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(74,168,255,.15)}
+  .hint{font-size:12px;color:#6f7d8c;margin-top:4px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .out{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line)}
+  .out:last-child{border-bottom:0}
+  .out span:first-child{color:var(--dim)}
+  .big{font-size:34px;font-weight:800;color:var(--acc);letter-spacing:-1px;margin:2px 0}
+  .pressure{margin-top:14px}
+  .bar{height:10px;background:#0d1116;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--warn),var(--bad))}
+  .neg{color:var(--bad)}
+  .pro{position:relative;overflow:hidden}
+  .pro .fog{filter:blur(5px);opacity:.5;user-select:none;pointer-events:none}
+  .lock{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+        background:#20180e;border:1px solid #4a3a1d;border-radius:11px;padding:12px 14px;margin-top:14px}
+  .lock p{margin:0;font-size:13px;color:#e7c98f}
+  button{background:var(--acc);color:#06231a;border:0;border-radius:10px;padding:11px 18px;
+         font-weight:800;font-size:14px;cursor:pointer}
+  button:hover{filter:brightness(1.08)}
+  button.ghost{background:transparent;color:var(--acc2);border:1px solid #33506e}
+  .disc{margin-top:22px;font-size:12px;color:#7d8a98;border-left:3px solid var(--line);padding-left:12px}
+  .tag{display:inline-block;font-size:11px;color:var(--warn);border:1px solid #4a3a1d;
+       background:#20180e;border-radius:999px;padding:3px 9px;margin-left:8px}
+  a{color:var(--acc2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Quanto ti resta davvero in tasca?</h1>
+    <span class="badge">Prototipo locale</span>
+  </header>
+  <p class="sub">
+    Inserisci i tuoi numeri: vedi subito quanto sopravvive tra contributi, imposta e IVA —
+    e quanto devi fatturare per portare a casa il netto che vuoi. Tutto calcolato nel tuo browser.
+  </p>
+  <div id="banner-aliquote" style="font-size:13px;color:#9fb0c0;background:#161d25;border:1px solid #2a323c;
+       border-radius:10px;padding:10px 14px;margin-bottom:18px">Carico le aliquote…</div>
+
+  <div class="grid">
+    <!-- INPUT -->
+    <section class="card">
+      <h2>I tuoi dati</h2>
+
+      <label for="lordo">Compenso lordo annuo (€)</label>
+      <input id="lordo" type="number" value="30000" min="0" step="500">
+
+      <div class="row">
+        <div>
+          <label for="regime">Regime</label>
+          <select id="regime">
+            <option value="forfettario">Forfettario</option>
+            <option value="ordinario">Ordinario</option>
+          </select>
+        </div>
+        <div>
+          <label for="coeff">Coefficiente ATECO (%)</label>
+          <input id="coeff" type="number" value="78" min="1" max="100">
+        </div>
+      </div>
+      <div class="hint">Forfettario: il reddito imponibile è lordo × coefficiente (es. 78% per molti servizi).</div>
+
+      <div class="row">
+        <div>
+          <label for="cassa">Cassa previdenziale</label>
+          <select id="cassa">
+            <option value="gs">INPS Gestione Separata</option>
+            <option value="artigiani">INPS Artigiani/Commercianti</option>
+            <option value="nessuna">Nessuna (stima)</option>
+          </select>
+        </div>
+        <div>
+          <label for="aliquota_inps">Aliquota contributi (%)</label>
+          <input id="aliquota_inps" type="number" value="26.07" step="0.01" min="0" max="60">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="imposta">Imposta sostitutiva / IRPEF (%)</label>
+          <input id="imposta" type="number" value="15" step="0.5" min="0" max="60">
+        </div>
+        <div>
+          <label for="iva">IVA (%)</label>
+          <input id="iva" type="number" value="22" step="1" min="0" max="30">
+        </div>
+      </div>
+      <div class="hint">Aliquota ridotta 5% per i primi 5 anni (forfettario, requisiti). IVA: la incassi dal cliente e la versi, non è tua.</div>
+    </section>
+
+    <!-- OUTPUT -->
+    <section class="card">
+      <h2>Il risultato</h2>
+      <div class="out"><span>Fatturato lordo</span><span id="o_lordo">—</span></div>
+      <div class="out"><span>Reddito imponibile <i id="o_coeff"></i></span><span id="o_reddito">—</span></div>
+      <div class="out"><span>Contributi previdenziali</span><span id="o_contrib" class="neg">—</span></div>
+      <div class="out"><span>Imposta <i id="o_aliq"></i></span><span id="o_imposta" class="neg">—</span></div>
+      <div class="out" style="margin-top:8px"><span><b>Netto in tasca</b></span></div>
+      <div class="big" id="o_netto">—</div>
+      <div class="hint" id="o_netto_mese">—</div>
+
+      <div class="pressure">
+        <div class="out"><span>Pressione fiscale e contributiva</span><span id="o_press">—</span></div>
+        <div class="bar"><i id="o_bar" style="width:0%"></i></div>
+      </div>
+
+      <div class="out" style="margin-top:16px"><span>Fatturare per portare a casa <b>20.000 €</b></span><span id="o_target">—</span></div>
+      <div class="out"><span>Sei in perdita? (aliquota Artigiani sotto il minimale)</span><span id="o_minimale">—</span></div>
+
+      <div class="hint" style="margin-top:14px">IVA da versare al cliente: <b id="o_iva">—</b> (non è tua, la giri allo Stato).</div>
+    </section>
+  </div>
+
+  <!-- PRO -->
+  <section class="card pro" style="margin-top:18px">
+    <h2>Versione Pro <span class="tag">€12 una tantum — anteprima</span></h2>
+    <div class="fog">
+      <div class="out"><span>Preventivo cliente: ore × tariffa + spese</span><span>es. 32h × 45 € = 1.440 €</span></div>
+      <div class="out"><span>Breakdown per il cliente (PDF con il tuo logo)</span><span>pronto in 1 clic</span></div>
+      <div class="out"><span>Confronto scenari: 20k / 30k / 40k / 50k</span><span>tabella comparativa</span></div>
+      <div class="out"><span>Salvataggio delle tue tariffe</span><span>restano nel browser</span></div>
+    </div>
+    <div class="lock">
+      <p>🔒 Queste funzioni si sbloccano con un codice, dopo l'acquisto. <b>Nel prototipo non sono attive.</b></p>
+      <button class="ghost" onclick="alert('Nel prototipo il pulsante non fa nulla.\n\nIn produzione aprirebbe la pagina di pagamento Gumroad (10% + 0,50 € per vendita), che genera un codice di licenza.')">Come funzionerebbe →</button>
+    </div>
+  </section>
+
+  <p class="disc">
+    <b>⚠️ Questo è uno strumento di orientamento</b>, non consulenza fiscale. I calcoli usano aliquote
+    e coefficienti caricati da <code>aliquote.json</code>, con data di verifica visibile in alto.
+    Il regime fiscale italiano è complesso: casi particolari (altre casse, agevolazioni, regimi
+    transitori, massimali) possono cambiare il risultato. Per decisioni reali, verifica con un
+    commercialista o sulle fonti ufficiali (Agenzia delle Entrate, INPS).
+  </p>
+</div>
+
+<script>
+const el = id => document.getElementById(id);
+const set = (id, txt) => { const n = el(id); if (n) n.textContent = txt; };
+const eur = n => (n < 0 ? "−" : "") + Math.abs(Math.round(n)).toLocaleString("it-IT") + " €";
+
+function calcola(){
+  const lordo   = +el("lordo").value || 0;
+  const coeff   = (+el("coeff").value || 0) / 100;
+  const aliqInps= (+el("aliquota_inps").value || 0) / 100;
+  const aliqImp = (+el("imposta").value || 0) / 100;
+  const iva     = (+el("iva").value || 0) / 100;
+  const regime  = el("regime").value;
+  const cassa   = el("cassa").value;
+
+  const c = (regime === "forfettario") ? coeff : 1;
+  const reddito  = lordo * c;
+  const contrib  = reddito * aliqInps;
+  const base     = Math.max(0, reddito - contrib);
+  const imposta  = base * aliqImp;
+  const netto    = lordo - contrib - imposta;
+  const pressure = lordo > 0 ? (1 - netto / lordo) * 100 : 0;
+
+  el("o_lordo").textContent   = eur(lordo);
+  el("o_reddito").textContent = eur(reddito);
+  el("o_coeff").textContent   = regime === "forfettario" ? "(" + (c*100).toFixed(0) + "%)" : "(100%)";
+  el("o_contrib").textContent = "− " + eur(contrib);
+  el("o_imposta").textContent = "− " + eur(imposta);
+  set("o_aliq", "(" + (aliqImp*100).toFixed(1) + "%)");
+  el("o_netto").textContent   = eur(netto);
+  el("o_netto_mese").textContent = "≈ " + eur(netto/12) + " al mese su 12 mensilità";
+  el("o_press").textContent   = pressure.toFixed(1) + "%";
+  el("o_bar").style.width     = Math.min(100, pressure) + "%";
+  el("o_iva").textContent     = eur(lordo * iva) + " (" + (iva*100).toFixed(0) + "%)";
+
+  // fatturare per un netto obiettivo
+  const k = 1 - c*aliqInps - c*(1-aliqInps)*aliqImp;
+  el("o_target").textContent = k > 0.05 ? eur(20000/k) : "—";
+
+  // avviso minimale artigiani (indicativo)
+  if (cassa === "artigiani" && reddito < 18500){
+    el("o_minimale").textContent = "⚠️ sì (contributi sul minimale)";
+    el("o_minimale").className = "neg";
+  } else {
+    el("o_minimale").textContent = "no";
+    el("o_minimale").className = "";
+  }
+}
+
+document.querySelectorAll("input,select").forEach(i => i.addEventListener("input", calcola));
+calcola();
+
+function applicaAliquote(d){
+  const v = d.valori || {};
+  if (v.aliquota_gs)           el("aliquota_inps").value = v.aliquota_gs.valore;
+  if (v.imposta_sostitutiva)   el("imposta").value       = v.imposta_sostitutiva.valore;
+  if (v.iva_ordinaria)         el("iva").value           = v.iva_ordinaria.valore;
+  if (v.coefficiente_servizi)  el("coeff").value         = v.coefficiente_servizi.valore;
+
+  const data = d.verificate_il || "n/d";
+  const tutti = Object.values(v);
+  const indicativi = tutti.filter(x => x.stato !== "verificato").length;
+  const b = el("banner-aliquote");
+  b.innerHTML = (indicativi === 0)
+    ? `✅ Aliquote <b>verificate</b> al ${data}.`
+    : `📅 Aliquote caricate da <code>aliquote.json</code>, verificate al <b>${data}</b>. ` +
+      `⚠️ <b>${indicativi} su ${tutti.length}</b> sono ancora <i>indicative</i> (non confrontate ` +
+      `con fonte ufficiale): il risultato è una <b>stima di orientamento</b>, non consulenza fiscale.`;
+}
+
+fetch("aliquote.json", {cache:"no-store"})
+  .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+  .then(d => { applicaAliquote(d); calcola(); })
+  .catch(err => {
+    el("banner-aliquote").innerHTML =
+      "⚠️ Non riesco a leggere <code>aliquote.json</code> (" + err.message + "): uso i valori " +
+      "predefiniti, <b>non verificati</b>. Se hai aperto il file col doppio clic, prova da un server locale.";
+  });
+</script>
+</body>
+</html>
