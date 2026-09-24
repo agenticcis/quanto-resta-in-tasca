@@ -1,0 +1,272 @@
+{
+  "_fonte": "Allegato 4 alla Legge 190/2014 (regime forfettario) - tabella ufficiale dei coefficienti di redditività",
+  "_url": "https://www.agenziaentrate.gov.it/portale/documents/20143/241208/allegato%2B4.pdf/d69be7fc-b18a-3c73-bd2e-b0f3c1970218",
+  "_verificato_il": "2026-09-24",
+  "_nota": "Elenco dei codici ATECO piu' comuni, non esaustivo. Il coefficiente non e' scritto qui: viene calcolato dal codice con la tabella ufficiale (aliquote_ateco.json). Si puo' digitare qualsiasi codice ATECO, anche non presente in questo elenco.",
+  "codici": [
+    {
+      "c": "62.01.00",
+      "d": "Produzione di software non connesso all'edizione"
+    },
+    {
+      "c": "62.02.00",
+      "d": "Consulenza nel settore delle tecnologie dell'informatica"
+    },
+    {
+      "c": "62.03.00",
+      "d": "Gestione di strutture e apparecchiature informatiche"
+    },
+    {
+      "c": "62.09.09",
+      "d": "Altre attività dei servizi connessi alle tecnologie dell'informatica"
+    },
+    {
+      "c": "63.11.00",
+      "d": "Elaborazione dati, hosting e attività connesse"
+    },
+    {
+      "c": "63.12.00",
+      "d": "Portali web"
+    },
+    {
+      "c": "58.21.00",
+      "d": "Edizione di giochi per computer"
+    },
+    {
+      "c": "58.29.00",
+      "d": "Altre edizioni di software"
+    },
+    {
+      "c": "61.10.00",
+      "d": "Telecomunicazioni via cavo, senza fili e satellitari (operatore)"
+    },
+    {
+      "c": "61.90.00",
+      "d": "Altre attività di telecomunicazione"
+    },
+    {
+      "c": "59.11.00",
+      "d": "Attività di produzione cinematografica, video e programmi TV"
+    },
+    {
+      "c": "63.99.00",
+      "d": "Altre attività dei servizi di informazione"
+    },
+    {
+      "c": "69.10.10",
+      "d": "Attività degli studi legali"
+    },
+    {
+      "c": "69.20.00",
+      "d": "Attività degli studi commercialisti e dei revisori contabili"
+    },
+    {
+      "c": "70.21.00",
+      "d": "Pubbliche relazioni e comunicazione"
+    },
+    {
+      "c": "70.22.09",
+      "d": "Consulenza imprenditoriale e amministrativo-gestionale"
+    },
+    {
+      "c": "71.11.00",
+      "d": "Attività degli studi di architettura"
+    },
+    {
+      "c": "71.12.10",
+      "d": "Servizi di ingegneria integrata"
+    },
+    {
+      "c": "71.12.20",
+      "d": "Servizi di ingegneria"
+    },
+    {
+      "c": "73.11.02",
+      "d": "Conduzione di campagne di marketing e pubblicitarie"
+    },
+    {
+      "c": "73.12.00",
+      "d": "Attività delle concessionarie e degli agenti pubblicitari"
+    },
+    {
+      "c": "74.10.21",
+      "d": "Attività dei disegnatori grafici di pagine web"
+    },
+    {
+      "c": "74.10.29",
+      "d": "Altre attività dei disegnatori grafici"
+    },
+    {
+      "c": "74.20.19",
+      "d": "Altre attività di riprese fotografiche"
+    },
+    {
+      "c": "74.30.00",
+      "d": "Traduzione e interpretariato"
+    },
+    {
+      "c": "74.90.99",
+      "d": "Altre attività professionali (consulenza tecnica, ecc.)"
+    },
+    {
+      "c": "72.19.09",
+      "d": "Altre attività di ricerca e sviluppo sperimentale"
+    },
+    {
+      "c": "85.59.20",
+      "d": "Corsi di formazione e aggiornamento professionale"
+    },
+    {
+      "c": "85.59.30",
+      "d": "Altre attività di istruzione e formazione"
+    },
+    {
+      "c": "85.60.09",
+      "d": "Altre attività di supporto all'istruzione"
+    },
+    {
+      "c": "86.90.30",
+      "d": "Attività di psicologi e psicoterapeuti"
+    },
+    {
+      "c": "86.90.99",
+      "d": "Altre attività paramediche e sanitarie"
+    },
+    {
+      "c": "66.19.99",
+      "d": "Altre attività dei servizi finanziari"
+    },
+    {
+      "c": "66.22.00",
+      "d": "Attività di agenti e broker assicurativi"
+    },
+    {
+      "c": "41.20.00",
+      "d": "Costruzione di edifici residenziali e non residenziali"
+    },
+    {
+      "c": "43.21.01",
+      "d": "Installazione di impianti elettrici"
+    },
+    {
+      "c": "43.22.01",
+      "d": "Installazione di impianti idraulici, di riscaldamento e di condizionamento"
+    },
+    {
+      "c": "43.32.01",
+      "d": "Lavori di falegnameria e installazione di infissi"
+    },
+    {
+      "c": "43.91.00",
+      "d": "Lavori di copertura di tetti"
+    },
+    {
+      "c": "68.10.00",
+      "d": "Compravendita di beni immobili propri"
+    },
+    {
+      "c": "68.20.01",
+      "d": "Locazione immobiliare di beni propri"
+    },
+    {
+      "c": "68.31.00",
+      "d": "Intermediazione immobiliare"
+    },
+    {
+      "c": "45.20.00",
+      "d": "Manutenzione e riparazione di autoveicoli"
+    },
+    {
+      "c": "46.49.00",
+      "d": "Commercio all'ingrosso di altri prodotti"
+    },
+    {
+      "c": "47.11.10",
+      "d": "Ipermercati"
+    },
+    {
+      "c": "47.19.10",
+      "d": "Grandi magazzini"
+    },
+    {
+      "c": "47.41.00",
+      "d": "Commercio al dettaglio di computer, software e attrezzature per ufficio"
+    },
+    {
+      "c": "47.42.00",
+      "d": "Commercio al dettaglio di apparecchiature per le telecomunicazioni"
+    },
+    {
+      "c": "47.71.10",
+      "d": "Commercio al dettaglio di abbigliamento"
+    },
+    {
+      "c": "47.91.10",
+      "d": "Commercio al dettaglio per corrispondenza o via internet (e-commerce)"
+    },
+    {
+      "c": "47.99.00",
+      "d": "Altro commercio al dettaglio al di fuori di negozi, banchi e mercati"
+    },
+    {
+      "c": "46.11.00",
+      "d": "Intermediari del commercio di materie prime agricole"
+    },
+    {
+      "c": "46.19.00",
+      "d": "Intermediari del commercio di vari prodotti"
+    },
+    {
+      "c": "47.81.01",
+      "d": "Commercio ambulante di prodotti alimentari e bevande"
+    },
+    {
+      "c": "47.82.01",
+      "d": "Commercio ambulante di altri prodotti"
+    },
+    {
+      "c": "55.10.00",
+      "d": "Alberghi e strutture simili"
+    },
+    {
+      "c": "55.20.51",
+      "d": "Affittacamere per brevi soggiorni, bed and breakfast"
+    },
+    {
+      "c": "56.10.11",
+      "d": "Ristorazione con somministrazione"
+    },
+    {
+      "c": "56.21.00",
+      "d": "Fornitura di pasti preparati (catering)"
+    },
+    {
+      "c": "56.30.00",
+      "d": "Bar e altri esercizi simili senza cucina"
+    },
+    {
+      "c": "96.02.00",
+      "d": "Servizi dei saloni di barbiere e di parrucchiere"
+    },
+    {
+      "c": "96.09.09",
+      "d": "Altre attività di servizi per la persona"
+    },
+    {
+      "c": "93.13.09",
+      "d": "Servizi di palestre e attività sportive"
+    },
+    {
+      "c": "81.21.00",
+      "d": "Pulizia generale di edifici"
+    },
+    {
+      "c": "79.11.00",
+      "d": "Attività di agenzie di viaggio"
+    },
+    {
+      "c": "95.11.00",
+      "d": "Riparazione di computer e periferiche"
+    }
+  ]
+}

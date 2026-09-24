@@ -54,6 +54,13 @@
         border-radius:9px;padding:10px 12px;font-size:15px;outline:none}
   input:focus,select:focus{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(74,168,255,.15)}
   .hint{font-size:12px;color:#6f7d8c;margin-top:4px}
+  #ateco-lista{position:absolute;z-index:20;left:0;right:0;top:100%;max-height:260px;overflow-y:auto;
+    background:#161d25;border:1px solid #2a323c;border-radius:10px;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,.45)}
+  #ateco-lista div{padding:8px 10px;cursor:pointer;font-size:13px;border-bottom:1px solid #1e2630}
+  #ateco-lista div:last-child{border-bottom:0}
+  #ateco-lista div:hover{background:#1d2733}
+  #ateco-lista .c{font-weight:700;color:var(--acc)}
+  #ateco-lista .p{font-size:11px;color:#6f7d8c;margin-left:6px}
   .hint.fb-acceso{color:var(--acc);font-weight:600}
   .hint.fb-errore{color:var(--bad)}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -111,9 +118,10 @@
       <input id="lordo" type="number" value="30000" min="0" step="500">
 
       <div class="row">
-        <div>
-          <label for="ateco">Codice ATECO (es. 62.02.00)</label>
-          <input id="ateco" type="text" value="62.02.00" placeholder="es. 62.02.00, 70.22.09, 47.41.00">
+        <div style="position:relative">
+          <label for="ateco">Codice ATECO (cerca o scrivi)</label>
+          <input id="ateco" type="text" value="62.02.00" placeholder="es. consulenza informatica, 70.22.09…" autocomplete="off">
+          <div id="ateco-lista" hidden></div>
         </div>
         <div>
           <label for="tipo_cliente">Tipo di cliente</label>
@@ -265,12 +273,29 @@
   </section>
 
   <p class="disc">
-    <b>⚠️ Questo è uno strumento di orientamento</b>, non consulenza fiscale. I calcoli usano aliquote
-    e coefficienti caricati da <code>aliquote.json</code>, con data di verifica visibile in alto.
+    <b>⚠️ Questo è uno strumento di orientamento</b>, non consulenza fiscale. I calcoli usano
+    coefficienti e aliquote presi dalle <b>fonti ufficiali</b>, con la data di verifica visibile in alto.
     Il regime fiscale italiano è complesso: casi particolari (altre casse, agevolazioni, regimi
     transitori, massimali) possono cambiare il risultato. Per decisioni reali, verifica con un
-    commercialista o sulle fonti ufficiali (Agenzia delle Entrate, INPS).
+    commercialista.
   </p>
+
+  <details id="fonti" class="disc" style="margin-top:10px">
+    <summary style="cursor:pointer;color:#4aa8ff;font-weight:600">📗 Le fonti dei dati (clicca per aprirle)</summary>
+    <ul style="margin:10px 0 0 18px;line-height:1.7">
+      <li><b>Coefficienti di redditività</b> — Allegato 4 alla Legge 190/2014:
+        <a href="https://www.agenziaentrate.gov.it/portale/documents/20143/241208/allegato%2B4.pdf/d69be7fc-b18a-3c73-bd2e-b0f3c1970218" target="_blank" rel="noopener">PDF ufficiale (Agenzia delle Entrate)</a></li>
+      <li><b>Imposta sostitutiva 15% / 5%</b> — Legge 190/2014, art. 1, commi 64 e 65:
+        <a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2014-12-23;190!vig=" target="_blank" rel="noopener">testo di legge (Normattiva)</a></li>
+      <li><b>Contributi INPS Gestione Separata</b> — aliquota e circolare dell'anno:
+        <a href="https://www.inps.it/" target="_blank" rel="noopener">INPS</a>
+        <span class="hint">(aliquota da confermare su fonte ufficiale per l'anno corrente)</span></li>
+      <li><b>IVA 22%</b> — DPR 633/1972, art. 16:
+        <a href="https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:decreto.del.presidente.della.repubblica:1972-10-26;633~art16!vig=" target="_blank" rel="noopener">testo di legge (Normattiva)</a></li>
+      <li><b>Fuori campo IVA per clienti esteri</b> — art. 7-ter DPR 633/1972:
+        <a href="https://www.agenziaentrate.gov.it/" target="_blank" rel="noopener">Agenzia delle Entrate</a></li>
+    </ul>
+  </details>
 
   <p class="hint" style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">
     <b>RestaNetto</b> — calcolatore gratuito per freelance e Partita IVA. Calcoli nel tuo
@@ -368,7 +393,9 @@ function calcola(){
 }
 
 document.querySelectorAll("input,select").forEach(i => i.addEventListener("input", () => { calcola(); aggiornaPro(); }));
-el("ateco").addEventListener("input", () => { aggiornaDaAteco(false); calcola(); });
+el("ateco").addEventListener("focus", () => { mostraListaAteco(); });
+el("ateco").addEventListener("input", () => { aggiornaDaAteco(false); mostraListaAteco(); calcola(); });
+el("ateco").addEventListener("blur", () => { nascondiListaAteco(); });
 el("ateco").addEventListener("change", () => { aggiornaDaAteco(true); calcola(); });
 calcola();
 statoProIniziale();
@@ -385,9 +412,9 @@ function applicaAliquote(d){
   const indicativi = tutti.filter(x => x.stato !== "verificato").length;
   const b = el("banner-aliquote");
   b.innerHTML = (indicativi === 0)
-    ? `✅ Aliquote <b>verificate</b> al ${data}.`
-    : `📅 Aliquote caricate da <code>aliquote.json</code>, verificate al <b>${data}</b>. ` +
-      `⚠️ <b>${indicativi} su ${tutti.length}</b> sono ancora <i>indicative</i> (non confrontate ` +
+    ? `✅ Dati fiscali <b>verificati</b> al ${data}. Coefficienti, contributi e imposte vengono dalle fonti ufficiali.`
+    : `📅 Dati fiscali aggiornati al <b>${data}</b>. ` +
+      `⚠️ <b>${indicativi} su ${tutti.length}</b> sono ancora <i>indicativi</i> (non confrontati ` +
       `con fonte ufficiale): il risultato è una <b>stima di orientamento</b>, non consulenza fiscale.`;
 }
 
@@ -396,6 +423,7 @@ function applicaAliquote(d){
    delle Entrate). Il coefficiente dipende dalla DIVISIONE (prime 2 cifre). */
 
 let ATECO = null;
+let LISTA_ATECO = [];
 
 function coefficienteDaAteco(codice){
   if (!codice || !ATECO) return null;
@@ -454,6 +482,48 @@ function aggiornaDaAteco(sovrascrivi){
     el("coeff").value = res.c;
   }
 }
+
+/* ---- menu a tendina con ricerca sull'elenco dei codici ATECO ---- */
+
+function normalizza(s){
+  return String(s || "").toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
+
+function mostraListaAteco(){
+  const box = el("ateco-lista");
+  const q = normalizza(el("ateco").value);
+  const risultati = LISTA_ATECO.filter(x => {
+    if (!q) return true;
+    return normalizza(x.c).includes(q) || normalizza(x.d).includes(q);
+  }).slice(0, 30);
+
+  if (!risultati.length){
+    box.innerHTML = '<div style="color:#6f7d8c;cursor:default">Nessun codice trovato. ' +
+      'Puoi comunque scriverlo a mano.</div>';
+    box.hidden = false;
+    return;
+  }
+  box.innerHTML = risultati.map(x => {
+    const coeff = coefficienteDaAteco(x.c);
+    const pc = coeff ? '<span class="p">' + coeff.c + '%</span>' : '';
+    return '<div data-codice="' + x.c + '"><span class="c">' + x.c + '</span>' + pc +
+      '<br><span style="font-size:12px;color:#9fb0c0">' + x.d + '</span></div>';
+  }).join("");
+  box.hidden = false;
+  box.querySelectorAll("div[data-codice]").forEach(d => {
+    d.addEventListener("mousedown", (ev) => {
+      ev.preventDefault(); // evita il blur prima della scelta
+      el("ateco").value = d.getAttribute("data-codice");
+      box.hidden = true;
+      aggiornaDaAteco(true);
+      calcola();
+    });
+  });
+}
+
+function nascondiListaAteco(){ el("ateco-lista").hidden = true; }
 
 /* =====================  VERSIONE PRO  ===================== */
 
@@ -754,10 +824,12 @@ function ripristinaTariffe(){
 
 Promise.all([
   fetch("aliquote.json", {cache:"no-store"}).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }),
-  fetch("aliquote_ateco.json", {cache:"no-store"}).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+  fetch("aliquote_ateco.json", {cache:"no-store"}).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }),
+  fetch("ateco_lista.json", {cache:"no-store"}).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
 ])
-  .then(([aliquote, ateco]) => {
+  .then(([aliquote, ateco, lista]) => {
     ATECO = ateco;
+    LISTA_ATECO = (lista && lista.codici) ? lista.codici : [];
     applicaAliquote(aliquote);
     aggiornaDaAteco(true);
     calcola();
@@ -765,7 +837,7 @@ Promise.all([
   })
   .catch(err => {
     el("banner-aliquote").innerHTML =
-      "⚠️ Non riesco a leggere i file delle aliquote (" + err.message + "): uso i valori " +
+      "⚠️ Non riesco a leggere i dati delle aliquote (" + err.message + "): uso i valori " +
       "predefiniti, <b>non verificati</b>. Se hai aperto il file col doppio clic, prova da un server locale.";
   });
 </script>
