@@ -4,6 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quanto ti resta davvero in tasca — Calcolatore netto Partita IVA / forfettario</title>
+<meta name="description" content="Calcolatore gratuito: dal fatturato al netto che ti resta davvero in tasca, con coefficiente ATECO, INPS e imposta sostitutiva del regime forfettario. Nessuna registrazione.">
+<link rel="canonical" href="https://agenticcis.github.io/quanto-resta-in-tasca/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Quanto ti resta davvero in tasca — Calcolatore netto P.IVA">
+<meta property="og:description" content="Dal fatturato al netto reale: coefficiente ATECO, INPS e imposta sostitutiva. Gratuito, senza registrazione.">
+<meta property="og:url" content="https://agenticcis.github.io/quanto-resta-in-tasca/">
+<meta property="og:locale" content="it_IT">
+<meta name="robots" content="index,follow">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Quanto ti resta davvero in tasca",
+  "url": "https://agenticcis.github.io/quanto-resta-in-tasca/",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "inLanguage": "it-IT",
+  "description": "Calcolatore gratuito del netto per freelance e Partita IVA in regime forfettario: fatturato, coefficiente ATECO, contributi INPS e imposta sostitutiva.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+}
+</script>
+<!-- ANALYTICS: qui il contatore senza cookie (nessun banner GDPR necessario) -->
 <style>
   :root{
     --bg:#0f1216; --card:#171c22; --card2:#1e242c; --line:#2a323c;
@@ -231,8 +253,11 @@ const set = (id, txt) => { const n = el(id); if (n) n.textContent = txt; };
 const eur = n => (n < 0 ? "−" : "") + Math.abs(Math.round(n)).toLocaleString("it-IT") + " €";
 
  // --- Versione Pro: configurazione Gumroad ---
-const GUMROAD_PRODOTTO  = "https://ontirius.gumroad.com/l/netto-piva-forfettario";
-const GUMROAD_CHECKOUT  = GUMROAD_PRODOTTO + "?wanted=true";
+// UTM: se arriva una vendita, in Gumroad vediamo che viene dal sito (e non da
+// un link incollato a mano altrove). Serve a misurare, non a profilare nessuno.
+const GUMROAD_UTM       = "utm_source=quanto-resta-in-tasca&utm_medium=web&utm_campaign=pro12";
+const GUMROAD_PRODOTTO  = "https://ontirius.gumroad.com/l/netto-piva-forfettario?" + GUMROAD_UTM;
+const GUMROAD_CHECKOUT  = GUMROAD_PRODOTTO + "&wanted=true";
 // La verifica licenze richiede il "product_id" (non il permalink) per i prodotti
 // creati dal 9/1/2023 — fonte: help.gumroad.com/article/76-license-keys.
 // Il permalink interno ("nzgir") NON coincide con lo slug dell'URL: lo teniamo
