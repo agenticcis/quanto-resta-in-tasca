@@ -3,12 +3,12 @@
   "nota": "Valori usati dal calcolatore. 'stato': verificato = testo di legge letto direttamente sulla fonte ufficiale; indicativo = stima non ancora verificata su fonte primaria. Le voci 'indicativo' sono dichiarate come tali nel banner del sito.",
   "valori": {
     "aliquota_gs": {
-      "valore": 26.0,
+      "valore": 26.07,
       "unita": "%",
       "stato": "verificato",
-      "descrizione": "INPS Gestione Separata - professionisti senza altra copertura",
-      "fonte": "INPS, circolare n. 8 del 03/02/2026",
-      "url": "https://www.inps.it/",
+      "descrizione": "INPS Gestione Separata - professionisti senza altra copertura (25,00 IVS + 0,72 aggiuntiva + 0,35 ISCRO)",
+      "fonte": "INPS, circolare n. 8 del 03/02/2026 (aliquote 2026, sezione 2 Professionisti)",
+      "url": "https://www.inps.it/it/it/inps-comunica/atti/circolari-messaggi-e-normativa/dettaglio.circolari-e-messaggi.2026.02.circolare-numero-8-del-03-02-2026_15153.html",
       "verificata_il": "2026-09-24"
     },
     "imposta_sostitutiva": {
@@ -29,14 +29,6 @@
       "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2014-12-23;190!vig=",
       "verificata_il": "2026-09-24"
     },
-    "coefficiente_servizi": {
-      "valore": 78,
-      "unita": "%",
-      "stato": "indicativo",
-      "descrizione": "Coefficiente di redditivita' - servizi professionali (es. 78%). Il valore dipende dal codice ATECO: da scegliere in base alla propria attivita'.",
-      "fonte": "L. 190/2014, Allegato 4 (tabella non ancora letta su fonte primaria)",
-      "url": "https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2014-12-23;190!vig=~all4"
-    },
     "iva_ordinaria": {
       "valore": 22,
       "unita": "%",
@@ -49,10 +41,29 @@
     "massimale_gs": {
       "valore": 122295,
       "unita": "EUR",
-      "stato": "indicativo",
-      "descrizione": "Massimale reddito Gestione Separata 2026. Va confermato ogni anno con la circolare INPS.",
-      "fonte": "INPS, circolare n. 8 del 03/02/2026 (documento non ancora letto su fonte primaria)",
-      "url": "https://www.inps.it/"
+      "stato": "verificato",
+      "descrizione": "Massimale reddito Gestione Separata 2026",
+      "fonte": "INPS, circolare n. 8 del 03/02/2026 (sezione 6.1)",
+      "url": "https://www.inps.it/it/it/inps-comunica/atti/circolari-messaggi-e-normativa/dettaglio.circolari-e-messaggi.2026.02.circolare-numero-8-del-03-02-2026_15153.html",
+      "verificata_il": "2026-09-24"
+    },
+    "aliquota_gs_pensionati": {
+      "valore": 24,
+      "unita": "%",
+      "stato": "verificato",
+      "descrizione": "INPS Gestione Separata - professionisti pensionati o con altra copertura previdenziale",
+      "fonte": "INPS, circolare n. 8 del 03/02/2026",
+      "url": "https://www.inps.it/it/it/inps-comunica/atti/circolari-messaggi-e-normativa/dettaglio.circolari-e-messaggi.2026.02.circolare-numero-8-del-03-02-2026_15153.html",
+      "verificata_il": "2026-09-24"
+    },
+    "minimale_gs": {
+      "valore": 18808,
+      "unita": "EUR",
+      "stato": "verificato",
+      "descrizione": "Minimale reddito Gestione Separata 2026",
+      "fonte": "INPS, circolare n. 8 del 03/02/2026 (sezione 6.2)",
+      "url": "https://www.inps.it/it/it/inps-comunica/atti/circolari-messaggi-e-normativa/dettaglio.circolari-e-messaggi.2026.02.circolare-numero-8-del-03-02-2026_15153.html",
+      "verificata_il": "2026-09-24"
     }
   }
 }

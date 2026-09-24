@@ -382,9 +382,9 @@ function calcola(){
     el("o_obiettivo_nota").innerHTML = k > 0.05 ? "" : "⚠️ Aliquote non valide: impossibile calcolare l'inverso.";
   }
 
-  // avviso minimale artigiani (indicativo)
-  if (cassa === "artigiani" && reddito < 18500){
-    el("o_minimale").textContent = "⚠️ sì (contributi sul minimale)";
+  // avviso contributo minimale (il minimale di reddito 2026 è 18.808 €, fonte INPS circ. 8/2026)
+  if (cassa === "artigiani" && reddito < 18808){
+    el("o_minimale").textContent = "⚠️ sì (contributi sul minimale di 18.808 €)";
     el("o_minimale").className = "neg";
   } else {
     el("o_minimale").textContent = "no";
@@ -405,7 +405,8 @@ function applicaAliquote(d){
   if (v.aliquota_gs)           el("aliquota_inps").value = v.aliquota_gs.valore;
   if (v.imposta_sostitutiva)   el("imposta").value       = v.imposta_sostitutiva.valore;
   if (v.iva_ordinaria)         el("iva").value           = v.iva_ordinaria.valore;
-  if (v.coefficiente_servizi)  el("coeff").value         = v.coefficiente_servizi.valore;
+  // Il coefficiente NON viene dai dati generali: lo decide il codice ATECO
+  // (tabella ufficiale, Allegato 4 L. 190/2014). Vedi aggiornaDaAteco().
 
   const data = d.verificate_il || "n/d";
   const tutti = Object.values(v);
