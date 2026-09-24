@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://agenticcis.github.io/quanto-resta-in-tasca/sitemap.xml
