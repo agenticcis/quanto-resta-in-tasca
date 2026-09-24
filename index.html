@@ -112,6 +112,21 @@
 
       <div class="row">
         <div>
+          <label for="ateco">Codice ATECO (es. 62.02.00)</label>
+          <input id="ateco" type="text" value="62.02.00" placeholder="es. 62.02.00, 70.22.09, 47.41.00">
+        </div>
+        <div>
+          <label for="tipo_cliente">Tipo di cliente</label>
+          <select id="tipo_cliente">
+            <option value="italia">Italia</option>
+            <option value="estero">Estero (fuori campo IVA)</option>
+          </select>
+        </div>
+      </div>
+      <div class="hint" id="ateco-hint">Il coefficiente giusto viene messo in automatico dal codice ATECO.</div>
+
+      <div class="row">
+        <div>
           <label for="regime">Regime</label>
           <select id="regime">
             <option value="forfettario">Forfettario</option>
@@ -120,10 +135,11 @@
         </div>
         <div>
           <label for="coeff">Coefficiente ATECO (%)</label>
-          <input id="coeff" type="number" value="78" min="1" max="100">
+          <input id="coeff" type="number" value="67" min="1" max="100">
         </div>
       </div>
-      <div class="hint">Forfettario: il reddito imponibile è lordo × coefficiente (es. 78% per molti servizi).</div>
+      <div class="hint">Forfettario: imponibile = lordo × coefficiente. Per il settore informatico (divisione 62) è <b>67%</b>, non 78%.</div>
+      <div class="hint" id="coeff-avviso" hidden></div>
 
       <div class="row">
         <div>
@@ -169,10 +185,17 @@
         <div class="bar"><i id="o_bar" style="width:0%"></i></div>
       </div>
 
-      <div class="out" style="margin-top:16px"><span>Fatturare per portare a casa <b>20.000 €</b></span><span id="o_target">—</span></div>
+      <div class="out" style="margin-top:16px">
+        <span>Netto mensile che vuoi portare a casa (€)
+          <input id="obiettivo" type="number" value="2000" min="0" step="50"
+                 style="width:110px;display:inline-block;margin-left:8px"></span>
+      </div>
+      <div class="out"><span>Devi fatturare (all'anno)</span><span id="o_fatt_anno">—</span></div>
+      <div class="out"><span>Devi fatturare (al mese)</span><span id="o_fatt_mese">—</span></div>
       <div class="out"><span>Sei in perdita? (aliquota Artigiani sotto il minimale)</span><span id="o_minimale">—</span></div>
+      <div class="hint" id="o_obiettivo_nota"></div>
 
-      <div class="hint" style="margin-top:14px">IVA da versare al cliente: <b id="o_iva">—</b> (non è tua, la giri allo Stato).</div>
+      <div class="hint" id="o_iva_nota" style="margin-top:14px">IVA addebitata al cliente e versata allo Stato: non è tua.</div>
     </section>
   </div>
 
@@ -303,11 +326,36 @@ function calcola(){
   el("o_netto_mese").textContent = "≈ " + eur(netto/12) + " al mese su 12 mensilità";
   el("o_press").textContent   = pressure.toFixed(1) + "%";
   el("o_bar").style.width     = Math.min(100, pressure) + "%";
-  el("o_iva").textContent     = eur(lordo * iva) + " (" + (iva*100).toFixed(0) + "%)";
+  const estero = el("tipo_cliente").value === "estero";
+  el("o_iva").textContent     = estero
+    ? "fuori campo IVA (art. 7-ter)"
+    : eur(lordo * iva) + " (" + (iva*100).toFixed(0) + "%)";
+  const notaIVA = el("o_iva_nota");
+  if (notaIVA) notaIVA.textContent = estero
+    ? "Con cliente estero la fattura è fuori campo IVA: non addebiti l'IVA. Ricordati l'iscrizione VIES e la comunicazione al Sistema San Marino/esterometro."
+    : "IVA addebitata al cliente e versata allo Stato: non è tua.";
 
-  // fatturare per un netto obiettivo
+  // fatturare per un netto obiettivo (l'inversa: quanto devo fatturare)
   const k = 1 - c*aliqInps - c*(1-aliqInps)*aliqImp;
-  el("o_target").textContent = k > 0.05 ? eur(20000/k) : "—";
+  const obiettivoMese = +el("obiettivo").value || 0;
+  if (k > 0.05 && obiettivoMese > 0){
+    const nettoAnnuo = obiettivoMese * 12;
+    const fattAnno = nettoAnnuo / k;
+    el("o_fatt_anno").textContent = eur(fattAnno);
+    el("o_fatt_mese").textContent = eur(fattAnno / 12);
+    const limite = (regime === "forfettario") ? 85000 : null;
+    let nota = `Per portare a casa <b>${eur(nettoAnnuo)}</b> netti all'anno (${eur(obiettivoMese)}/mese su 12) ` +
+      `devi fatturare <b>${eur(fattAnno)}</b>.`;
+    if (limite && fattAnno > limite){
+      nota += ` ⚠️ <b>Attenzione: superi il limite di ${eur(limite)} del forfettario.</b> ` +
+        `Oltre quella soglia si esce dal regime agevolato.`;
+    }
+    el("o_obiettivo_nota").innerHTML = nota;
+  } else {
+    el("o_fatt_anno").textContent = "—";
+    el("o_fatt_mese").textContent = "—";
+    el("o_obiettivo_nota").innerHTML = k > 0.05 ? "" : "⚠️ Aliquote non valide: impossibile calcolare l'inverso.";
+  }
 
   // avviso minimale artigiani (indicativo)
   if (cassa === "artigiani" && reddito < 18500){
@@ -320,6 +368,8 @@ function calcola(){
 }
 
 document.querySelectorAll("input,select").forEach(i => i.addEventListener("input", () => { calcola(); aggiornaPro(); }));
+el("ateco").addEventListener("input", () => { aggiornaDaAteco(false); calcola(); });
+el("ateco").addEventListener("change", () => { aggiornaDaAteco(true); calcola(); });
 calcola();
 statoProIniziale();
 
@@ -339,6 +389,70 @@ function applicaAliquote(d){
     : `📅 Aliquote caricate da <code>aliquote.json</code>, verificate al <b>${data}</b>. ` +
       `⚠️ <b>${indicativi} su ${tutti.length}</b> sono ancora <i>indicative</i> (non confrontate ` +
       `con fonte ufficiale): il risultato è una <b>stima di orientamento</b>, non consulenza fiscale.`;
+}
+
+/* =====================  COEFFICIENTE DA CODICE ATECO  ===================== */
+/* Tabella ufficiale: Allegato 4 alla L. 190/2014 (allegato al PDF dell'Agenzia
+   delle Entrate). Il coefficiente dipende dalla DIVISIONE (prime 2 cifre). */
+
+let ATECO = null;
+
+function coefficienteDaAteco(codice){
+  if (!codice || !ATECO) return null;
+  const c = String(codice).trim().replace(",", ".");
+
+  // casi specifici (gruppi con codici a 4-5 cifre)
+  if (c.startsWith("47.81")) return {c: 40, noto: "Commercio ambulante di prodotti alimentari e bevande"};
+  if (c.startsWith("47.82") || c.startsWith("47.89")) return {c: 54, noto: "Commercio ambulante di altri prodotti"};
+  if (c.startsWith("46.1")) return {c: 62, noto: "Intermediari del commercio"};
+  if (c.startsWith("46.")) return {c: 40, noto: "Commercio all'ingrosso — gruppo 40%"};
+  if (c.startsWith("47.")) return {c: 40, noto: "Commercio al dettaglio — gruppo 40%"};
+  if (/^4[567]/.test(c) && !c.includes(".")) return null;
+
+  const m = c.match(/^(\d{2})/);
+  if (!m) return null;
+  const div = m[1];
+  const tab = ATECO.per_divisione || {};
+  if (tab[div] !== undefined) return {c: tab[div], noto: "divisione " + div};
+  // divisioni non elencate esplicitamente: regola generale 67%
+  if (ATECO.regola_generale) {
+    return {c: ATECO.regola_generale.coefficiente, noto: "non elencata: regola generale"};
+  }
+  return null;
+}
+
+function aggiornaDaAteco(sovrascrivi){
+  const codice = el("ateco").value;
+  const res = coefficienteDaAteco(codice);
+  const hint = el("ateco-hint");
+  const avviso = el("coeff-avviso");
+  const coeffAttuale = +el("coeff").value || 0;
+
+  if (!res){
+    hint.innerHTML = "Scrivi un codice ATECO valido (es. 62.02.00) per avere il coefficiente giusto.";
+    avviso.hidden = true;
+    return;
+  }
+
+  hint.innerHTML = `📗 Codice <b>${codice}</b> → coefficiente <b>${res.c}%</b> (${res.noto}).
+     Fonte: Allegato 4 alla L. 190/2014 (Agenzia delle Entrate).`;
+
+  // avviso se il numero scritto a mano è anomalo per quel codice
+  if (coeffAttuale && coeffAttuale !== res.c){
+    avviso.hidden = false;
+    avviso.innerHTML = `⚠️ Per il codice <b>${codice}</b> il coefficiente corretto è <b>${res.c}%</b>, ` +
+      `ma hai inserito <b>${coeffAttuale}%</b>. Con ${coeffAttuale}% il netto calcolato non è realistico ` +
+      `(differenza di circa ${Math.abs(coeffAttuale - res.c)} punti sul reddito imponibile). ` +
+      `<a href="#" id="coeff-fix">Metti ${res.c}%</a>.`;
+    const fix = el("coeff-fix");
+    if (fix) fix.addEventListener("click", (e) => { e.preventDefault(); el("coeff").value = res.c; calcola(); aggiornaDaAteco(false); });
+  } else {
+    avviso.hidden = true;
+  }
+
+  if (sovrascrivi && coeffAttuale !== res.c){
+    el("coeff").value = res.c;
+  }
 }
 
 /* =====================  VERSIONE PRO  ===================== */
@@ -638,12 +752,20 @@ function ripristinaTariffe(){
   aggiornaPro();
 }
 
-fetch("aliquote.json", {cache:"no-store"})
-  .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-  .then(d => { applicaAliquote(d); calcola(); if (licenzaSalvata()) ripristinaTariffe(); else aggiornaPro(); })
+Promise.all([
+  fetch("aliquote.json", {cache:"no-store"}).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); }),
+  fetch("aliquote_ateco.json", {cache:"no-store"}).then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+])
+  .then(([aliquote, ateco]) => {
+    ATECO = ateco;
+    applicaAliquote(aliquote);
+    aggiornaDaAteco(true);
+    calcola();
+    if (licenzaSalvata()) ripristinaTariffe(); else aggiornaPro();
+  })
   .catch(err => {
     el("banner-aliquote").innerHTML =
-      "⚠️ Non riesco a leggere <code>aliquote.json</code> (" + err.message + "): uso i valori " +
+      "⚠️ Non riesco a leggere i file delle aliquote (" + err.message + "): uso i valori " +
       "predefiniti, <b>non verificati</b>. Se hai aperto il file col doppio clic, prova da un server locale.";
   });
 </script>
