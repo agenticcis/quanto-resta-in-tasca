@@ -233,6 +233,7 @@ const GUMROAD_PRODUCT_ID = "-ZOs5fnKfLM6ePh21fybKA==";
 const GUMROAD_PERMALINK  = "nzgir";
 const LIC_STORAGE = "qrt_pro_licenza";
 const TAR_STORAGE = "qrt_tariffe";
+const LIC_CHECK_STORAGE = "qrt_pro_controllo";
 
 function calcola(){
   const lordo   = +el("lordo").value || 0;
@@ -305,6 +306,40 @@ function licenzaSalvata(){
   try { return localStorage.getItem(LIC_STORAGE) || ""; } catch(e){ return ""; }
 }
 
+// Interroga Gumroad. Ritorna "ok" | "invalida" | "offline" (rete non raggiungibile).
+async function verificaConGumroad(codice){
+  let risposta = false, d = null;
+  try {
+    const tentativi = [
+      { product_id: GUMROAD_PRODUCT_ID },
+      { product_permalink: GUMROAD_PERMALINK }
+    ];
+    for (const base of tentativi){
+      const body = new URLSearchParams(Object.assign({
+        license_key: codice,
+        increment_uses_count: "false"   // nessun uso consumato: non imponiamo limiti
+      }, base));
+      const r = await fetch("https://api.gumroad.com/v2/licenses/verify", { method: "POST", body });
+      d = await r.json(); risposta = true;
+      if (d.success) break;
+    }
+  } catch(e){
+    return { esito: "offline" };
+  }
+  if (!risposta || !d || !d.success) return { esito: "invalida" };
+  return { esito: "ok", dati: d };
+}
+
+function licenzaUltimoControllo(){
+  try { return +localStorage.getItem(LIC_CHECK_STORAGE) || 0; } catch(e){ return 0; }
+}
+function segnaControllo(){
+  try { localStorage.setItem(LIC_CHECK_STORAGE, String(Date.now())); } catch(e){}
+}
+function dimenticaLicenza(){
+  try { localStorage.removeItem(LIC_STORAGE); localStorage.removeItem(LIC_CHECK_STORAGE); } catch(e){}
+}
+
 function parametri(){
   const coeff    = (+el("coeff").value || 0) / 100;
   const aliqInps = (+el("aliquota_inps").value || 0) / 100;
@@ -333,11 +368,54 @@ function mostraPro(attiva, codice){
   }
 }
 
+function problemiLicenza(p){
+  const problemi = [];
+  if (p.refunded) problemi.push("acquisto rimborsato");
+  if (p.chargebacked) problemi.push("pagamento stornato");
+  if (p.subscription_cancelled) problemi.push("abbonamento cancellato");
+  return problemi;
+}
+
+const GIORNI_TROLLERANZA_OFFLINE = 7;
+
 function statoProIniziale(){
   el("lic-acquista").href = GUMROAD_CHECKOUT;
   const lic = licenzaSalvata();
-  mostraPro(!!lic, lic);
-  if (lic) ripristinaTariffe();
+  if (!lic){ mostraPro(false); return; }
+  // Mostra subito l'accesso, poi ricontrolla davvero con Gumroad: una licenza
+  // rimborsata o cancellata deve richiudere l'accesso, anche se era gia' salvata.
+  mostraPro(true, lic);
+  ricontrollaLicenza(lic);
+}
+
+async function ricontrollaLicenza(codice){
+  const esito = await verificaConGumroad(codice);
+  if (esito.esito === "ok"){
+    if (problemiLicenza(esito.dati.purchase || {}).length){
+      dimenticaLicenza();
+      mostraPro(false);
+      el("lic-stato").textContent = "Licenza non piu' attiva: l'acquisto risulta rimborsato o stornato.";
+      el("lic-stato").style.color = "var(--bad)";
+      return;
+    }
+    segnaControllo();
+    return;
+  }
+  if (esito.esito === "invalida"){
+    // Gumroad ha risposto ed e' un no netto: non e' una chiave valida.
+    dimenticaLicenza();
+    mostraPro(false);
+    el("lic-stato").textContent = "Licenza non piu' valida. Inserisci di nuovo il codice, o scrivici.";
+    el("lic-stato").style.color = "var(--bad)";
+    return;
+  }
+  // Offline: non punire un cliente pagante per un problema di rete.
+  const giorni = (Date.now() - licenzaUltimoControllo()) / 86400000;
+  if (giorni > GIORNI_TROLLERANZA_OFFLINE){
+    mostraPro(false);
+    el("lic-stato").textContent = "Non riesco a verificare la licenza adesso (sei offline da giorni). Riprova quando hai rete.";
+    el("lic-stato").style.color = "var(--warn)";
+  }
 }
 
 async function sblocca(){
@@ -345,53 +423,37 @@ async function sblocca(){
   const stato  = el("lic-stato");
   if (!codice){ stato.textContent = "Inserisci un codice."; stato.style.color = "var(--warn)"; return; }
   stato.textContent = "Verifico…"; stato.style.color = "var(--dim)";
-  try {
-    let acquisto = null;
-    const tentativi = [
-      { product_id: GUMROAD_PRODUCT_ID },
-      { product_permalink: GUMROAD_PERMALINK }
-    ];
-    for (const base of tentativi){
-      const body = new URLSearchParams(Object.assign({
-        license_key: codice,
-        increment_uses_count: "false"   // nessun uso consumato: non imponiamo limiti
-      }, base));
-      const r = await fetch("https://api.gumroad.com/v2/licenses/verify", { method: "POST", body });
-      const d = await r.json();
-      if (d.success){ acquisto = d; break; }
-    }
-    if (!acquisto){
-      stato.innerHTML = "Codice non valido per questo prodotto.<br>" +
-        "Controlla che sia la <b>license key</b> ricevuta per email dopo l'acquisto " +
-        "(è lunga e con i trattini: es. 1A2B3C4D-5E6F7A8B-9C0D1E2F) e non il " +
-        "<b>codice sconto</b> usato al checkout.";
-      stato.style.color = "var(--bad)";
-      return;
-    }
-    const p = acquisto.purchase || {};
-    const problemi = [];
-    if (p.refunded) problemi.push("acquisto rimborsato");
-    if (p.chargebacked) problemi.push("pagamento stornato");
-    if (p.subscription_cancelled) problemi.push("abbonamento cancellato");
-    if (problemi.length){
-      stato.textContent = "Licenza non attiva (" + problemi.join(", ") + ").";
-      stato.style.color = "var(--bad)";
-      return;
-    }
-    try { localStorage.setItem(LIC_STORAGE, codice); } catch(e){}
-    stato.textContent = "Attivata. Grazie!";
-    stato.style.color = "var(--acc)";
-    el("licenza").value = "";
-    ripristinaTariffe();
-    mostraPro(true, codice);
-  } catch(e){
-    stato.textContent = "Non riesco a contattare Gumroad (" + e.message + "). Riprova tra poco.";
+  const esito = await verificaConGumroad(codice);
+  if (esito.esito === "offline"){
+    stato.textContent = "Non riesco a contattare Gumroad. Controlla la connessione e riprova.";
     stato.style.color = "var(--bad)";
+    return;
   }
+  if (esito.esito === "invalida"){
+    stato.innerHTML = "Codice non valido per questo prodotto.<br>" +
+      "Controlla che sia la <b>license key</b> ricevuta per email dopo l'acquisto " +
+      "(è lunga e con i trattini: es. 1A2B3C4D-5E6F7A8B-9C0D1E2F) e non il " +
+      "<b>codice sconto</b> usato al checkout.";
+    stato.style.color = "var(--bad)";
+    return;
+  }
+  const problemi = problemiLicenza(esito.dati.purchase || {});
+  if (problemi.length){
+    stato.textContent = "Licenza non attiva (" + problemi.join(", ") + ").";
+    stato.style.color = "var(--bad)";
+    return;
+  }
+  try { localStorage.setItem(LIC_STORAGE, codice); } catch(e){}
+  segnaControllo();
+  stato.textContent = "Attivata. Grazie!";
+  stato.style.color = "var(--acc)";
+  el("licenza").value = "";
+  ripristinaTariffe();
+  mostraPro(true, codice);
 }
 
 function disattiva(){
-  try { localStorage.removeItem(LIC_STORAGE); } catch(e){}
+  dimenticaLicenza();
   mostraPro(false);
   el("lic-stato").textContent = "Licenza rimossa da questo browser.";
 }
