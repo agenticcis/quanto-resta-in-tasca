@@ -159,7 +159,9 @@
     <div id="pro-locked">
       <div class="fog">
         <div class="out"><span>Preventivo cliente: ore × tariffa + spese</span><span>es. 32h × 45 € = 1.440 €</span></div>
-        <div class="out"><span>Breakdown del preventivo, pronto da inviare</span><span>1 clic</span></div>
+        <div class="out"><span>Quanto ti resta di quel compenso</span><span>stessa logica della calcolatrice</span></div>
+        <div class="out"><span>Copia il preventivo in 1 clic</span><span>testo pronto da incollare</span></div>
+        <div class="out"><span>Stampa o salva in PDF</span><span>su carta intestata tua</span></div>
         <div class="out"><span>Confronto scenari: 20k / 30k / 40k / 50k</span><span>tabella comparativa</span></div>
         <div class="out"><span>Salvataggio delle tue tariffe</span><span>restano nel browser</span></div>
       </div>
@@ -179,6 +181,10 @@
       <p class="hint" id="pro-chi" style="margin-bottom:6px"></p>
 
       <h3>1. Preventivo cliente</h3>
+      <div class="row" style="grid-template-columns:1fr">
+        <div><label>Intestazione (nome, studio o P.IVA)</label>
+          <input id="p_intestazione" type="text" placeholder="es. Mario Rossi — P.IVA 01234567890"></div>
+      </div>
       <div class="row">
         <div><label>Ore</label><input id="p_ore" type="number" value="32" step="0.5" min="0"></div>
         <div><label>Tariffa oraria (€)</label><input id="p_tariffa" type="number" value="45" step="1" min="0"></div>
@@ -486,15 +492,21 @@ function aggiornaPro(){
   el("t_scen").innerHTML = html;
 }
 
-function testoPreventivo(){
+function intestazione(){
+  return (el("p_intestazione").value || "").trim();
+}
+
+function testoPreventivo(intestazionePulita){
   const p       = parametri();
   const desc    = el("p_desc").value.trim() || "Prestazione professionale";
   const ore     = +el("p_ore").value || 0;
   const tariffa = +el("p_tariffa").value || 0;
   const spese   = +el("p_spese").value || 0;
+  const testa   = intestazione();
   const imponibile = ore*tariffa + spese;
   const n       = nettoDa(imponibile, p);
   const L = [];
+  if (testa && !intestazionePulita) L.push(testa, "");
   L.push("PREVENTIVO");
   L.push("Data: " + new Date().toLocaleDateString("it-IT"));
   L.push("");
@@ -530,9 +542,13 @@ function stampaPreventivo(){
   const w = window.open("", "_blank");
   if (!w){ esito("p_esito", "Il browser ha bloccato la finestra. Consenti i popup per questo sito.", "errore"); return; }
   const esc = s => String(s).replace(/[&<>]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;" }[c]));
+  const testa = intestazione();
   w.document.write("<!doctype html><html lang='it'><head><meta charset='utf-8'><title>Preventivo</title>" +
     "<style>body{font:14px/1.7 system-ui,sans-serif;max-width:640px;margin:40px auto;padding:0 20px;color:#111}" +
-    "pre{white-space:pre-wrap;font:inherit}</style></head><body><pre>" + esc(testoPreventivo()) + "</pre></body></html>");
+    "h1{font-size:15px;margin:0 0 24px;padding-bottom:10px;border-bottom:2px solid #111}" +
+    "pre{white-space:pre-wrap;font:inherit;margin:0}</style></head><body>" +
+    (testa ? "<h1>" + esc(testa) + "</h1>" : "") +
+    "<pre>" + esc(testoPreventivo(true)) + "</pre></body></html>");
   w.document.close();
   w.focus();
   w.print();
@@ -559,7 +575,8 @@ function salvaTariffe(){
     cassa: el("cassa").value, aliquota_inps: el("aliquota_inps").value,
     imposta: el("imposta").value, iva: el("iva").value,
     p_ore: el("p_ore").value, p_tariffa: el("p_tariffa").value,
-    p_spese: el("p_spese").value, p_desc: el("p_desc").value
+    p_spese: el("p_spese").value, p_desc: el("p_desc").value,
+    p_intestazione: el("p_intestazione").value
   };
   const b = el("btn-salva");
   try {
