@@ -104,6 +104,9 @@
            white-space:pre-wrap;font:13px/1.7 ui-monospace,Menlo,Consolas,monospace;
            color:var(--txt);margin-top:12px}
   .lic-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .cta-pro{display:inline-block;width:100%;text-align:center;background:var(--acc);color:#04121f;
+    font-weight:700;font-size:16px;text-decoration:none;padding:14px 18px;border-radius:10px}
+  .cta-pro:hover{filter:brightness(1.08)}
 </style>
 </head>
 <body>
@@ -219,10 +222,13 @@
 
   <!-- PRO -->
   <section class="card pro" id="pro-box" style="margin-top:18px">
-    <h2>Versione Pro <span class="tag" id="pro-tag">12 € una tantum</span></h2>
+    <h2>Sblocca la versione Pro <span class="tag" id="pro-tag">12 € una volta sola</span></h2>
 
     <!-- bloccata -->
     <div id="pro-locked">
+      <p style="margin:0 0 10px"><b>A cosa ti serve:</b> trasformare il calcolo in un
+      <b>preventivo pronto da mandare al cliente</b>, con la tua intestazione — e vedere subito
+      quanto ti resta di quel compenso.</p>
       <div class="fog">
         <div class="out"><span>Preventivo cliente: ore × tariffa + spese</span><span>es. 32h × 45 € = 1.440 €</span></div>
         <div class="out"><span>Quanto ti resta di quel compenso</span><span>stessa logica della calcolatrice</span></div>
@@ -232,13 +238,20 @@
         <div class="out"><span>Salvataggio delle tue tariffe</span><span>restano nel browser</span></div>
       </div>
       <div class="lock">
-        <p style="width:100%">🔒 Hai un codice di licenza? Inseriscilo per attivare gli strumenti Pro su questo browser.</p>
-        <div class="lic-row" style="width:100%">
-          <input id="licenza" placeholder="Codice licenza (es. 1A2B3C4D-5E6F7A8B-9C0D1E2F)" style="flex:1;min-width:240px">
-          <button onclick="sblocca()">Sblocca</button>
-        </div>
-        <p id="lic-stato" style="width:100%;margin:8px 0 0;font-size:13px"></p>
-        <a id="lic-acquista" href="#" target="_blank" rel="noopener">Non hai il codice? Acquistalo — 12 € →</a>
+        <a id="lic-acquista" class="cta-pro" href="#" target="_blank" rel="noopener">Sblocca la versione Pro — 12 € →</a>
+        <p class="hint" style="width:100%;margin:10px 0 0">Pagamento sicuro tramite Gumroad.
+        <b>Nessun abbonamento:</b> 12 € una volta sola, resta attiva su questo browser.
+        Funziona anche solo per il preventivo: se lo usi due volte, l'hai ripagato.</p>
+        <details style="width:100%;margin-top:12px">
+          <summary style="cursor:pointer;color:#9fb0c0;font-size:13px">Hai già comprato? Inserisci il codice</summary>
+          <p style="width:100%;margin:10px 0 6px;font-size:13px">Incolla la <b>chiave di licenza</b> che hai
+          ricevuto per email dopo l'acquisto (è lunga e con i trattini: es. 1A2B3C4D-5E6F7A8B-9C0D1E2F).</p>
+          <div class="lic-row" style="width:100%">
+            <input id="licenza" placeholder="Codice licenza (es. 1A2B3C4D-5E6F7A8B-9C0D1E2F)" style="flex:1;min-width:240px">
+            <button onclick="sblocca()">Sblocca</button>
+          </div>
+          <p id="lic-stato" style="width:100%;margin:8px 0 0;font-size:13px"></p>
+        </details>
       </div>
     </div>
 
@@ -615,7 +628,7 @@ function nettoDa(lordo, p){
 function mostraPro(attiva, codice){
   el("pro-locked").hidden   = attiva;
   el("pro-unlocked").hidden = !attiva;
-  el("pro-tag").textContent = attiva ? "attiva su questo browser" : "12 € una tantum";
+  el("pro-tag").textContent = attiva ? "attiva su questo browser" : "12 € una volta sola";
   if (attiva){
     el("pro-chi").textContent = codice ? ("Licenza attiva: " + codice) : "Licenza attiva su questo browser.";
     aggiornaPro();
