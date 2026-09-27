@@ -323,7 +323,7 @@
   <p class="hint" style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">
     <b>RestaNetto</b> — calcolatore gratuito per freelance e Partita IVA. Calcoli nel tuo
     browser, senza registrazione e senza cookie di tracciamento.
-    <span style="font-size:11px;color:#5a6675"> · versione 4 (27/09)</span>
+    <span style="font-size:11px;color:#5a6675"> · versione 5 (27/09)</span>
     <br><a href="quanto-fatturare/">Quanto devi fatturare per guadagnare X al mese? →</a>
   </p>
 </div>
@@ -377,9 +377,6 @@ function calcola(){
   el("o_press").textContent   = pressure.toFixed(1) + "%";
   el("o_bar").style.width     = Math.min(100, pressure) + "%";
   const estero = el("tipo_cliente").value === "estero";
-  el("o_iva").textContent     = estero
-    ? "fuori campo IVA (art. 7-ter)"
-    : eur(lordo * iva) + " (" + (iva*100).toFixed(0) + "%)";
   const notaIVA = el("o_iva_nota");
   if (notaIVA) notaIVA.textContent = estero
     ? "Con cliente estero la fattura è fuori campo IVA: non addebiti l'IVA. Ricordati l'iscrizione VIES e la comunicazione al Sistema San Marino/esterometro."
