@@ -323,6 +323,7 @@
   <p class="hint" style="margin-top:22px;border-top:1px solid var(--line);padding-top:14px">
     <b>RestaNetto</b> — calcolatore gratuito per freelance e Partita IVA. Calcoli nel tuo
     browser, senza registrazione e senza cookie di tracciamento.
+    <span style="font-size:11px;color:#5a6675"> · versione 4 (27/09)</span>
     <br><a href="quanto-fatturare/">Quanto devi fatturare per guadagnare X al mese? →</a>
   </p>
 </div>
@@ -418,7 +419,7 @@ function calcola(){
 
 document.querySelectorAll("input,select").forEach(i => i.addEventListener("input", () => { calcola(); aggiornaPro(); }));
 el("ateco").addEventListener("focus", () => { el("ateco").select(); mostraListaAteco(); });
-el("ateco").addEventListener("input", () => { aggiornaDaAteco(false); mostraListaAteco(); calcola(); });
+el("ateco").addEventListener("input", () => { aggiornaDaAteco(true); mostraListaAteco(); calcola(); });
 el("ateco").addEventListener("blur", () => { nascondiListaAteco(); });
 el("ateco").addEventListener("change", () => { aggiornaDaAteco(true); calcola(); });
 
