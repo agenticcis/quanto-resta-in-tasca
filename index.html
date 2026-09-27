@@ -133,7 +133,7 @@
       <div class="row">
         <div style="position:relative">
           <label for="ateco">Codice ATECO (cerca o scrivi)</label>
-          <input id="ateco" type="text" value="62.02.00" placeholder="es. consulenza informatica, 70.22.09…" autocomplete="off">
+          <input id="ateco" type="text" placeholder="es. 62.02.00, oppure cerca: informatica, avvocato, parrucchiere…" autocomplete="off">
           <div id="ateco-lista" hidden></div>
         </div>
         <div>
@@ -417,7 +417,7 @@ function calcola(){
 }
 
 document.querySelectorAll("input,select").forEach(i => i.addEventListener("input", () => { calcola(); aggiornaPro(); }));
-el("ateco").addEventListener("focus", () => { mostraListaAteco(); });
+el("ateco").addEventListener("focus", () => { el("ateco").select(); mostraListaAteco(); });
 el("ateco").addEventListener("input", () => { aggiornaDaAteco(false); mostraListaAteco(); calcola(); });
 el("ateco").addEventListener("blur", () => { nascondiListaAteco(); });
 el("ateco").addEventListener("change", () => { aggiornaDaAteco(true); calcola(); });
@@ -490,7 +490,9 @@ function aggiornaDaAteco(sovrascrivi){
   const coeffAttuale = +el("coeff").value || 0;
 
   if (!res){
-    hint.innerHTML = "Scrivi un codice ATECO valido (es. 62.02.00) per avere il coefficiente giusto.";
+    hint.innerHTML = "🔎 <b>Cerca il tuo codice ATECO</b> qui sopra: scrivi il numero " +
+      "(es. <b>62.02.00</b>) oppure una parola (es. <b>informatica</b>, <b>avvocato</b>). " +
+      "Il coefficiente giusto verrà messo in automatico.";
     avviso.hidden = true;
     return;
   }
